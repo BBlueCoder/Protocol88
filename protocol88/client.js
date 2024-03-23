@@ -1,10 +1,11 @@
 const EventEmitter = require("events");
+const net = require("net");
 const { parse, parseToRequest, setContentTypeHeader } = require("./parser");
 
 class Client extends EventEmitter {
-  constructor(client) {
+  constructor(host, port) {
     super();
-    this.client = client;
+    this.client = net.createConnection({ host: host, port: port });
     this.init();
   }
 
@@ -14,12 +15,11 @@ class Client extends EventEmitter {
     });
 
     this.client.on("error", (error) => {
-      console.log("Error from Server!", error);
+      this.emit("error", error);
     });
 
     this.client.on("end", () => {
-      console.log("Server ended the connection!");
-      this.send("why?");
+      this.emit("end");
     });
   }
 
